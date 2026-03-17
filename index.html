@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI活用技術研修 | CTCテクノロジー</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --accent:#2563EB;
+  --accent-light:#EBF5FF;
+  --accent-dark:#1D4ED8;
+  --accent-bg:rgba(37,99,235,.06);
+  --dark:#1A1A1A;
+  --gray-900:#2D2D2D;
+  --gray-700:#555;
+  --gray-500:#888;
+  --gray-300:#CCC;
+  --gray-100:#F5F5F5;
+  --white:#FFFFFF;
+  --font-sans:'Hiragino Kaku Gothic ProN','Noto Sans JP','Yu Gothic',sans-serif;
+  --font-mono:'SF Mono','Fira Code','Source Code Pro',monospace;
+  --max-w:960px;
+  --shadow:0 2px 12px rgba(0,0,0,.08);
+  --radius:8px;
+}
+html{font-size:16px;scroll-behavior:smooth}
+body{
+  font-family:var(--font-sans);
+  color:var(--dark);
+  background:var(--white);
+  line-height:1.8;
+  -webkit-font-smoothing:antialiased;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+}
+a{color:var(--accent);text-decoration:none;transition:opacity .2s}
+a:hover{opacity:.8}
+
+.site-header{
+  position:sticky;top:0;z-index:100;
+  background:rgba(255,255,255,.96);
+  backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--gray-100);
+  padding:14px 24px;
+}
+.header-inner{
+  max-width:var(--max-w);margin:0 auto;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.header-brand{font-size:.85rem;font-weight:700;color:var(--gray-700);letter-spacing:.04em;text-decoration:none}
+.header-brand span{color:var(--accent)}
+.header-nav{display:flex;align-items:center;gap:14px}
+.header-nav a{font-size:.74rem;font-weight:600;color:var(--gray-700)}
+.header-nav a:hover{color:var(--accent);opacity:1}
+
+.hero{
+  max-width:var(--max-w);margin:0 auto;
+  padding:100px 24px 60px;
+  text-align:center;
+}
+.hero-badge{
+  display:inline-block;
+  background:var(--accent);color:var(--white);
+  font-size:.72rem;font-weight:700;
+  padding:5px 16px;border-radius:20px;
+  letter-spacing:.08em;margin-bottom:24px;
+}
+.hero h1{
+  font-size:2.4rem;font-weight:800;
+  line-height:1.3;margin-bottom:16px;
+  letter-spacing:-.02em;
+}
+.hero h1 span{color:var(--accent)}
+.hero-sub{
+  font-size:1rem;color:var(--gray-700);
+  max-width:640px;margin:0 auto 32px;
+  line-height:1.8;
+}
+.hero-meta{
+  display:flex;flex-wrap:wrap;justify-content:center;gap:28px;
+  font-size:.88rem;color:var(--gray-700);
+}
+.hero-meta-item{display:flex;align-items:center;gap:6px}
+.hero-meta-item svg{width:16px;height:16px;color:var(--accent);flex-shrink:0}
+
+.overview{
+  max-width:var(--max-w);margin:0 auto;
+  padding:0 24px 60px;
+}
+.overview-title{
+  font-size:1.1rem;font-weight:700;
+  margin-bottom:24px;
+  padding-left:12px;
+  border-left:4px solid var(--accent);
+}
+.part-label{
+  display:inline-block;font-size:.72rem;font-weight:800;
+  color:var(--accent);letter-spacing:.1em;
+  margin-top:32px;margin-bottom:8px;
+}
+
+.tbl-wrap{
+  overflow-x:auto;
+  margin:12px 0 20px;
+  border:1px solid var(--gray-100);
+  border-radius:var(--radius);
+}
+.tbl-wrap table{width:100%;border-collapse:collapse;font-size:.86rem}
+.tbl-wrap th{
+  background:var(--dark);font-weight:700;text-align:left;
+  padding:12px 16px;color:var(--white);border-bottom:1px solid var(--gray-300);white-space:nowrap;
+}
+.tbl-wrap td{padding:11px 16px;color:var(--gray-700);border-bottom:1px solid var(--gray-100);vertical-align:top}
+.tbl-wrap tr:last-child td{border-bottom:none}
+.tbl-wrap tr:nth-child(even) td{background:rgba(0,0,0,.015)}
+.tbl-wrap tr.break-row td{color:var(--gray-500);font-style:italic}
+
+.session-cards{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:40px}
+.session-card{
+  position:relative;
+  background:var(--white);
+  border:1px solid var(--gray-100);
+  border-radius:12px;
+  padding:36px 32px 32px;
+  transition:transform .2s,box-shadow .2s;
+  display:flex;flex-direction:column;
+}
+.session-card:hover{transform:translateY(-4px);box-shadow:0 8px 32px rgba(0,0,0,.1)}
+.session-num{
+  font-size:.7rem;font-weight:800;color:var(--accent);
+  letter-spacing:.12em;margin-bottom:8px;
+}
+.session-card h2{font-size:1.15rem;font-weight:800;line-height:1.4;margin-bottom:10px}
+.session-card-desc{font-size:.86rem;color:var(--gray-700);line-height:1.7;margin-bottom:18px;flex:1}
+.session-card-meta{
+  display:flex;gap:12px;margin-bottom:18px;
+  font-size:.75rem;color:var(--gray-500);
+}
+.session-card-meta span{display:flex;align-items:center;gap:4px}
+.session-card-btn{
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--accent);color:var(--white);
+  font-size:.86rem;font-weight:700;
+  padding:11px 22px;border:none;border-radius:var(--radius);
+  cursor:pointer;transition:background .2s;
+  text-decoration:none;align-self:flex-start;
+}
+.session-card-btn:hover{background:var(--accent-dark);opacity:1}
+.session-card-btn svg{width:14px;height:14px}
+.session-card-btn.outline{
+  background:transparent;color:var(--accent);border:1.5px solid var(--accent);
+}
+.session-card-btn.outline:hover{background:var(--accent-bg)}
+
+.tag{
+  display:inline-block;font-size:.68rem;font-weight:700;
+  padding:2px 8px;border-radius:3px;
+  margin-right:4px;vertical-align:middle;
+}
+.tag-lecture{background:var(--gray-100);color:var(--gray-700);border:1px solid var(--gray-300)}
+.tag-handson{background:var(--accent-bg);color:var(--accent);border:1px solid rgba(37,99,235,.15)}
+
+.tools{
+  max-width:var(--max-w);margin:0 auto;
+  padding:60px 24px 60px;
+  border-top:1px solid var(--gray-100);
+}
+.tools-title{
+  font-size:1.1rem;font-weight:700;margin-bottom:24px;
+  padding-left:12px;border-left:4px solid var(--accent);
+}
+.tools-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}
+.tool-card{
+  display:flex;align-items:center;gap:14px;
+  padding:18px 20px;background:var(--gray-100);
+  border-radius:var(--radius);transition:transform .15s;
+}
+.tool-card:hover{transform:translateY(-2px)}
+.tool-icon-circle{
+  width:40px;height:40px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.tool-card h4{font-size:.88rem;font-weight:700;line-height:1.3}
+.tool-card p{font-size:.75rem;color:var(--gray-500);margin-top:2px}
+
+.prereq{
+  max-width:var(--max-w);margin:0 auto;
+  padding:0 24px 80px;
+}
+.prereq-title{
+  font-size:1.1rem;font-weight:700;margin-bottom:20px;
+  padding-left:12px;border-left:4px solid var(--accent);
+}
+.prereq-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.prereq-card{background:var(--accent-bg);border-radius:var(--radius);padding:20px 24px}
+.prereq-card h4{font-size:.88rem;font-weight:700;color:var(--accent);margin-bottom:8px}
+.prereq-card p{font-size:.82rem;color:var(--gray-700);line-height:1.7}
+
+.site-footer{
+  margin-top:auto;
+  max-width:var(--max-w);margin-left:auto;margin-right:auto;
+  width:100%;padding:40px 24px;
+  border-top:1px solid var(--gray-100);
+  text-align:center;font-size:.78rem;color:var(--gray-500);
+}
+.footer-links{display:flex;justify-content:center;gap:16px;margin-bottom:12px;flex-wrap:wrap}
+.footer-links a{font-weight:600;font-size:.78rem}
+
+@media(max-width:640px){
+  .hero h1{font-size:1.6rem}
+  .session-cards{grid-template-columns:1fr}
+  .tools-grid{grid-template-columns:1fr 1fr}
+  .prereq-grid{grid-template-columns:1fr}
+  .hero-meta{flex-direction:column;align-items:center;gap:12px}
+  .header-nav{gap:8px}
+  .header-nav a{font-size:.68rem}
+}
+@media print{
+  .site-header{position:static}
+  .session-card:hover{transform:none;box-shadow:none}
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+<div class="header-inner">
+  <span class="header-brand"><span>RAG</span> &amp; <span>AI-Driven Dev</span> Training</span>
+  <nav class="header-nav">
+    <a href="am-s1.html">AM-S1</a>
+    <a href="am-s2.html">AM-S2</a>
+    <a href="am-s3.html">AM-S3</a>
+    <a href="am-s4.html">AM-S4</a>
+    <a href="pm-s1.html">PM-S1</a>
+    <a href="pm-s2.html">PM-S2</a>
+    <a href="pm-s3.html">PM-S3</a>
+    <a href="pm-s4.html">PM-S4</a>
+  </nav>
+</div>
+</header>
+
+<div class="hero">
+  <div class="hero-badge">RAG &amp; AI-DRIVEN DEVELOPMENT 2026</div>
+  <h1>AI活用技術<span>研修</span></h1>
+  <p class="hero-sub">RAGシステムの構築からAI駆動開発まで。PythonとLangChainでRAGを体験する午前の部、Claude Codeで開発ワークフローを変える午後の部。丸一日かけて、AIをツールとして使いこなす力を身につける。</p>
+  <div class="hero-meta">
+    <div class="hero-meta-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      1日（9:30 - 17:30）
+    </div>
+    <div class="hero-meta-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      対面ハンズオン
+    </div>
+    <div class="hero-meta-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+      Python + LangChain + Claude Code
+    </div>
+  </div>
+</div>
+
+<div class="overview">
+  <div class="overview-title">タイムテーブル</div>
+
+  <div class="part-label">午前の部 ── RAGハンズオン</div>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>時間</th><th>区分</th><th>形式</th><th>内容</th></tr></thead>
+      <tbody>
+        <tr><td>9:30 - 9:50</td><td><a href="am-s1.html">Session 01</a></td><td><span class="tag tag-lecture">座学</span><span class="tag tag-handson">実践</span></td><td>オリエンテーション + 環境セットアップ</td></tr>
+        <tr><td>9:50 - 10:45</td><td><a href="am-s2.html">Session 02</a></td><td><span class="tag tag-handson">実践</span></td><td>Python基礎 + Chat Models + Prompt Templates</td></tr>
+        <tr class="break-row"><td>10:45 - 10:55</td><td>休憩</td><td>-</td><td>10分休憩</td></tr>
+        <tr><td>10:55 - 11:50</td><td><a href="am-s3.html">Session 03</a></td><td><span class="tag tag-handson">実践</span></td><td>RAGの構成要素を体験する</td></tr>
+        <tr class="break-row"><td>11:50 - 12:00</td><td>休憩</td><td>-</td><td>10分休憩</td></tr>
+        <tr><td>12:00 - 12:30</td><td><a href="am-s4.html">Session 04</a></td><td><span class="tag tag-handson">実践</span></td><td>LangGraph + RAG総合演習</td></tr>
+        <tr class="break-row"><td>12:30 - 13:30</td><td>昼休憩</td><td>-</td><td>60分</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="part-label">午後の部 ── AI駆動開発ハンズオン</div>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>時間</th><th>区分</th><th>形式</th><th>内容</th></tr></thead>
+      <tbody>
+        <tr><td>13:30 - 13:50</td><td><a href="pm-s1.html">Session 05</a></td><td><span class="tag tag-lecture">座学</span></td><td>Claude Code 導入・操作説明</td></tr>
+        <tr><td>13:50 - 14:45</td><td><a href="pm-s2.html">Session 06</a></td><td><span class="tag tag-handson">実践</span></td><td>ex01: ファイル生成 + ex02: バグ修正</td></tr>
+        <tr class="break-row"><td>14:45 - 14:55</td><td>休憩</td><td>-</td><td>10分休憩</td></tr>
+        <tr><td>14:55 - 16:05</td><td><a href="pm-s3.html">Session 07</a></td><td><span class="tag tag-handson">実践</span></td><td>ex03: コード生成 + ex04: リファクタリング</td></tr>
+        <tr class="break-row"><td>16:05 - 16:15</td><td>休憩</td><td>-</td><td>10分休憩</td></tr>
+        <tr><td>16:15 - 17:05</td><td><a href="pm-s4.html">Session 08</a></td><td><span class="tag tag-handson">実践</span></td><td>ex05: ミニプロジェクト構築</td></tr>
+        <tr><td>17:05 - 17:30</td><td>振り返り</td><td><span class="tag tag-lecture">座学</span></td><td>振り返り・質疑・クロージング</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="overview">
+  <div class="overview-title">セッション概要</div>
+
+  <div class="part-label">午前の部 ── RAGハンズオン（9:30 - 12:30）</div>
+  <div class="session-cards">
+    <div class="session-card">
+      <div class="session-num">SESSION 01</div>
+      <h2>オリエンテーション<br>環境セットアップ</h2>
+      <p class="session-card-desc">研修の目的と1日の流れを共有し、OpenAI APIへの接続テストを実施する。全員がコードを動かせる状態にしてから本編に入る。</p>
+      <div class="session-card-meta">
+        <span>20分</span>
+        <span>導入 + 実践</span>
+      </div>
+      <a href="am-s1.html" class="session-card-btn">
+        Session 01 を開く
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </a>
+    </div>
+
+    <div class="session-card">
+      <div class="session-num">SESSION 02</div>
+      <h2>Python基礎<br>LangChain入門</h2>
+      <p class="session-card-desc">研修で使うPython文法を6つに絞って体験。ChatOpenAIでLLMを呼び出し、Prompt TemplatesとLCELでChainを組む。</p>
+      <div class="session-card-meta">
+        <span>55分</span>
+        <span>実践 3トピック</span>
+      </div>
+      <a href="am-s2.html" class="session-card-btn">
+        Session 02 を開く
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </a>
+    </div>
+
+    <div class="session-card">
+      <div class="session-num">SESSION 03</div>
+      <h2>RAGの構成要素を<br>体験する</h2>
+      <p class="session-card-desc">Document Loader、Text Splitter、Embedding、Vector Store、Retrieverの5パーツを順に動かし、RAGの「検索」側を完成させる。</p>
+      <div class="session-card-meta">
+        <span>55分</span>
+        <span>実践 5ステップ</span>
+      </div>
+      <a href="am-s3.html" class="session-card-btn">
+        Session 03 を開く
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </a>
+    </div>
+
+    <div class="session-card">
+      <div class="session-num">SESSION 04</div>
+      <h2>LangGraph +<br>RAG総合演習</h2>
+      <p class="session-card-desc">State / Node / Edgeの3概念を学び、retrieve_nodeとgenerate_nodeを繋いでRAGシステムを完成させる。</p>
+      <div class="session-card-meta">
+        <span>30分</span>
+        <span>実践 2トピック</span>
+      </div>
+      <a href="am-s4.html" class="session-card-btn">
+        Session 04 を開く
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </a>
+    </div>
+  </div>
+
+  <div class="part-label" style="margin-top:48px">午後の部 ── AI駆動開発ハンズオン（13:30 - 17:30）</div>
+  <div class="session-cards">
+    <div class="session-card">
+      <div class="session-num">SESSION 05</div>
+      <h2>Claude Code<br>導入・操作説明</h2>
+      <p class="session-card-desc">Claude Codeの起動方法、Allow/Denyの仕組み、プロンプトのコツを説明する。AI駆動開発の考え方を共有してから演習に入る。</p>
+      <div class="session-card-meta">
+        <span>20分</span>
+        <span>座学</span>
+      </div>
+      <a href="pm-s1.html" class="session-card-btn outline">
+        Session 05 を開く
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </a>
+    </div>
+
+    <div class="session-card">
+      <div class="session-num">SESSION 06</div>
+      <h2>基本操作と<br>バグ修正</h2>
+      <p class="session-card-desc">ex01でファイル生成の基本フローを掴み、ex02でバグ入りスクリプトの症状を特定してClaude Codeに修正を依頼する。</p>
+      <div class="session-card-meta">
+        <span>55分</span>
+        <span>実践 2演習</span>
+      </div>
+      <a href="pm-s2.html" class="session-card-btn">
+        Session 06 を開く
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </a>
+    </div>
+
+    <div class="session-card">
+      <div class="session-num">SESSION 07</div>
+      <h2>コード生成と<br>リファクタリング</h2>
+      <p class="session-card-desc">ex03で仕様書からの実装を体験し、ex04で既存コードの解説とリファクタリングを依頼する。出力の一致が品質の証明。</p>
+      <div class="session-card-meta">
+        <span>70分</span>
+        <span>実践 2演習</span>
+      </div>
+      <a href="pm-s3.html" class="session-card-btn">
+        Session 07 を開く
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </a>
+    </div>
+
+    <div class="session-card">
+      <div class="session-num">SESSION 08</div>
+      <h2>ミニプロジェクト<br>振り返り</h2>
+      <p class="session-card-desc">ex05で要件定義書からCLIツールを構築。機能追加まで体験し、1日の学びを整理して振り返る。</p>
+      <div class="session-card-meta">
+        <span>75分</span>
+        <span>実践 + 振り返り</span>
+      </div>
+      <a href="pm-s4.html" class="session-card-btn">
+        Session 08 を開く
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </a>
+    </div>
+  </div>
+</div>
+
+<div class="tools">
+  <div class="tools-title">使用ツール</div>
+  <div class="tools-grid">
+    <div class="tool-card">
+      <div class="tool-icon-circle" style="background:#3776AB">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div>
+        <h4>Python 3.11+</h4>
+        <p>プログラミング言語</p>
+      </div>
+    </div>
+    <div class="tool-card">
+      <div class="tool-icon-circle" style="background:#1C3C3C">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z" stroke="white" stroke-width="2"/><polyline points="13 2 13 9 20 9" stroke="white" stroke-width="2"/></svg>
+      </div>
+      <div>
+        <h4>LangChain</h4>
+        <p>LLMフレームワーク</p>
+      </div>
+    </div>
+    <div class="tool-card">
+      <div class="tool-icon-circle" style="background:#4B5563">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="3" stroke="white" stroke-width="2"/><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" stroke="white" stroke-width="2"/></svg>
+      </div>
+      <div>
+        <h4>LangGraph</h4>
+        <p>グラフ実行エンジン</p>
+      </div>
+    </div>
+    <div class="tool-card">
+      <div class="tool-icon-circle" style="background:#10A37F">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div>
+        <h4>OpenAI API</h4>
+        <p>GPT-4o-mini / Embedding</p>
+      </div>
+    </div>
+    <div class="tool-card">
+      <div class="tool-icon-circle" style="background:#0668E1">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" stroke="white" stroke-width="2"/><path d="M3 9h18M9 21V9" stroke="white" stroke-width="2"/></svg>
+      </div>
+      <div>
+        <h4>FAISS</h4>
+        <p>ベクトル検索DB（Meta社）</p>
+      </div>
+    </div>
+    <div class="tool-card">
+      <div class="tool-icon-circle" style="background:#D97706">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div>
+        <h4>Claude Code</h4>
+        <p>AIコーディングアシスタント</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="prereq">
+  <div class="prereq-title">事前準備</div>
+  <div class="prereq-grid">
+    <div class="prereq-card">
+      <h4>VSCode + Python環境</h4>
+      <p>VSCodeが起動し、ターミナルで python --version を実行して 3.11 以上が表示されること。handsonフォルダと .env ファイルが配置済みであること。</p>
+    </div>
+    <div class="prereq-card">
+      <h4>Claude Code 拡張機能</h4>
+      <p>VSCodeの拡張機能としてClaude Codeがインストール済みであること。午後の部で使用する。セットアップ手順書を参照のこと。</p>
+    </div>
+    <div class="prereq-card">
+      <h4>OpenAI APIキー</h4>
+      <p>研修用APIキーを.envファイルに設定済みであること。00_test_connection.py の実行で全項目が [OK] になれば準備完了。</p>
+    </div>
+    <div class="prereq-card">
+      <h4>ネットワーク接続</h4>
+      <p>OpenAI API および Claude API への通信が可能であること。プロキシ環境の場合は事前に接続テストを実施しておく。</p>
+    </div>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="footer-links">
+    <a href="am-s1.html">AM-S1</a>
+    <a href="am-s2.html">AM-S2</a>
+    <a href="am-s3.html">AM-S3</a>
+    <a href="am-s4.html">AM-S4</a>
+    <a href="pm-s1.html">PM-S1</a>
+    <a href="pm-s2.html">PM-S2</a>
+    <a href="pm-s3.html">PM-S3</a>
+    <a href="pm-s4.html">PM-S4</a>
+  </div>
+  <p>RAG &amp; AI-Driven Dev Training Program &mdash; CTCテクノロジー株式会社</p>
+</footer>
+
+</body>
+</html>
