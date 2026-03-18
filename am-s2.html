@@ -225,6 +225,11 @@ a:hover{opacity:.7}
     </div>
   </div>
 
+  <div class="callout">
+    <div class="callout-title">importは何をしているのか</div>
+    <p>Pythonには標準で備わっている機能（printなど）以外に、世界中の開発者が作った追加機能（ライブラリ）がある。import文はそれらを「今から使います」と宣言する命令。<code style="font-family:var(--font-mono);font-size:.82rem;background:rgba(37,99,235,.08);padding:2px 6px;border-radius:3px;color:var(--accent-dark)">from langchain_openai import ChatOpenAI</code> は「langchain_openaiパッケージの中にあるChatOpenAIという部品を取り出す」という意味になる。</p>
+  </div>
+
   <div class="tbl-wrap">
     <table>
       <thead>
@@ -276,6 +281,23 @@ model = ChatOpenAI(model=<span class="str">"gpt-4o-mini"</span>)
 response = model.invoke(<span class="str">"こんにちは"</span>)
 print(response.content)</div>
 
+  <div class="reveal-wrap">
+    <button class="reveal-btn">
+      このコードは裏で何をしているのか
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div class="reveal-content">
+      <ol>
+        <li><code style="font-family:var(--font-mono)">load_dotenv()</code> ── .envファイルからOPENAI_API_KEYを読み込み、プログラムが使える状態にする</li>
+        <li><code style="font-family:var(--font-mono)">ChatOpenAI(model="gpt-4o-mini")</code> ── OpenAI APIを呼び出すための「電話機」を準備する。まだ電話はかけていない</li>
+        <li><code style="font-family:var(--font-mono)">model.invoke("こんにちは")</code> ── ここで実際にインターネット経由でOpenAIのサーバーに「こんにちは」というテキストを送信する。サーバー側のGPT-4o-miniが回答を生成し、それが返ってくる</li>
+        <li><code style="font-family:var(--font-mono)">response.content</code> ── 返ってきた回答オブジェクトの中から、テキスト部分だけを取り出す</li>
+      </ol>
+      <p style="margin-top:10px">この一連の流れで数秒かかるのは、インターネット通信が発生しているため。</p>
+      <p style="margin-top:6px"><a href="https://platform.openai.com/docs/api-reference/chat/create" target="_blank" rel="noopener">OpenAI Chat API Reference</a></p>
+    </div>
+  </div>
+
   <div class="callout">
     <div class="callout-title">この1行がLangChainの出発点</div>
     <p><code style="font-family:var(--font-mono);background:rgba(37,99,235,.08);padding:2px 6px;border-radius:3px">model.invoke("テキスト")</code> がLLMへの質問窓口。この1行がLangChainの出発点になる。</p>
@@ -309,6 +331,27 @@ model_creative = ChatOpenAI(model=<span class="str">"gpt-4o-mini"</span>, temper
       </ul>
     </div>
   </div>
+
+  <div class="reveal-wrap">
+    <button class="reveal-btn">
+      temperatureと「トークン」を理解する
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div class="reveal-content">
+      <ul>
+        <li>トークン = LLMが文章を処理する最小単位。日本語では1文字が1〜3トークン程度、英語では1単語が1〜2トークン</li>
+        <li>LLMは「次のトークンとして何が来る確率が高いか」を計算して文章を生成する。「東京の首都は...」の次に「日本」が来る確率は高く、「バナナ」が来る確率は低い</li>
+        <li>temperature=0 は確率が最も高いトークンを常に選ぶ設定。同じ質問をすれば同じ答えが返る</li>
+        <li>temperature=1 は確率が低いトークンも選ばれやすくなる設定。毎回違った表現が出てくる</li>
+        <li>RAGシステムでは情報の正確性が求められるため、temperature=0が基本となる</li>
+      </ul>
+      <p style="margin-top:10px">
+        <a href="https://platform.openai.com/docs/guides/text-generation" target="_blank" rel="noopener">OpenAI Text Generation Guide</a>
+        &nbsp;/&nbsp;
+        <a href="https://platform.openai.com/tokenizer" target="_blank" rel="noopener">OpenAI Tokenizer: 文章が何トークンになるか試せるツール</a>
+      </p>
+    </div>
+  </div>
 </section>
 
 <!-- ====== HANDS-ON 03: Prompt Templates と LCEL ====== -->
@@ -338,6 +381,11 @@ prompt = ChatPromptTemplate.from_template(
 )
 message = prompt.invoke({<span class="str">"product"</span>: <span class="str">"iPhone"</span>, <span class="str">"count"</span>: 3})</div>
 
+  <div class="callout">
+    <div class="callout-title">Prompt Templateを使う理由</div>
+    <p>毎回 <code style="font-family:var(--font-mono);font-size:.82rem;background:rgba(37,99,235,.08);padding:2px 6px;border-radius:3px;color:var(--accent-dark)">f"iPhoneの特徴を3個教えてください"</code> のように文字列を手書きしてもLLMは呼べる。だが、実際のシステムでは質問内容が毎回変わる。ChatPromptTemplateは{product}や{count}の部分を変数にして、あとから値を差し込める「テンプレート」を作る仕組み。ExcelでいうところのVLOOKUPのような差し込み機能に近い。</p>
+  </div>
+
   <div class="topic">
     <div class="topic-title">Step 2 ── SystemMessage</div>
   </div>
@@ -346,6 +394,23 @@ message = prompt.invoke({<span class="str">"product"</span>: <span class="str">"
     (<span class="str">"system"</span>, <span class="str">"あなたは親切な日本語アシスタントです。回答は3行以内にまとめてください。"</span>),
     (<span class="str">"human"</span>, <span class="str">"{question}"</span>)
 ])</div>
+
+  <div class="reveal-wrap">
+    <button class="reveal-btn">
+      SystemMessageとHumanMessageの違い
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div class="reveal-content">
+      <p>ChatGPTの画面では見えないが、裏側では「system」「human」「assistant」という3種類のメッセージが区別されている。</p>
+      <ul>
+        <li><strong>system</strong> ── AIの振る舞いを指定する指示書。「あなたは○○の専門家です」「回答は3行以内で」など。ユーザーには見えない裏設定</li>
+        <li><strong>human</strong> ── ユーザー（人間）からの入力。ChatGPTでいう「入力欄に打つ文章」</li>
+        <li><strong>assistant</strong> ── AIからの回答</li>
+      </ul>
+      <p style="margin-top:8px">RAGでは、systemメッセージに「以下の文書を参考に回答してください」と書くことで、AIが検索結果に基づいて回答するよう制御する。これがRAGの「生成」側の核心にあたる。</p>
+      <p style="margin-top:6px"><a href="https://platform.openai.com/docs/guides/text-generation" target="_blank" rel="noopener">OpenAI Text Generation Guide</a></p>
+    </div>
+  </div>
 
   <div class="callout">
     <div class="callout-title">SystemMessageがRAGの要になる</div>
@@ -367,6 +432,11 @@ result = chain.invoke({<span class="str">"product"</span>: <span class="str">"La
     <div class="box">model</div>
     <div class="arr">&#8594;</div>
     <div class="box">parser</div>
+  </div>
+
+  <div class="callout">
+    <div class="callout-title">パイプ演算子 | を「流れ作業」として理解する</div>
+    <p><code style="font-family:var(--font-mono);font-size:.82rem;background:rgba(37,99,235,.08);padding:2px 6px;border-radius:3px;color:var(--accent-dark)">prompt | model | parser</code> は「工場の流れ作業」と同じ。1番目の工程（prompt）で材料を準備し、2番目の工程（model）でAIが加工し、3番目の工程（parser）で出荷用に整える。Linuxのコマンドラインで <code style="font-family:var(--font-mono);font-size:.82rem;background:rgba(37,99,235,.08);padding:2px 6px;border-radius:3px;color:var(--accent-dark)">ls | grep ".py"</code> のようにパイプで繋ぐのと同じ発想。LangChainではこの書き方をLCEL（LangChain Expression Language）と呼ぶ。</p>
   </div>
 
   <div class="callout">
@@ -393,6 +463,9 @@ result = chain.invoke({<span class="str">"product"</span>: <span class="str">"La
     <div class="ref-title">参考リンク</div>
     <a href="https://python.langchain.com/docs/" target="_blank" rel="noopener" class="ref-link">LangChain Docs</a>
     <a href="https://platform.openai.com/docs/" target="_blank" rel="noopener" class="ref-link">OpenAI API Reference</a>
+    <a href="https://platform.openai.com/tokenizer" target="_blank" rel="noopener" class="ref-link">OpenAI Tokenizer（トークン数の確認）</a>
+    <a href="https://chat.openai.com/" target="_blank" rel="noopener" class="ref-link">ChatGPT（ブラウザで試せるLLM）</a>
+    <a href="https://pypi.org/project/python-dotenv/" target="_blank" rel="noopener" class="ref-link">Python dotenv ドキュメント</a>
   </div>
 </section>
 

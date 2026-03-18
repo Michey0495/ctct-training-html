@@ -195,6 +195,11 @@ a:hover{opacity:.7}
     <div class="box">Retriever</div>
   </div>
 
+  <div class="callout">
+    <div class="callout-title">RAGの「検索」側パイプラインの全体像</div>
+    <p>これから体験する5つのステップは、「紙の文書をAIが読める形に変換し、質問に関係する部分だけを取り出す」一連の処理。図書館に例えると、(1)本を仕入れる → (2)ページごとに切り分ける → (3)各ページの内容を索引カードに変換する → (4)索引カードを棚に整理する → (5)利用者の質問に合う索引カードを探す、という流れに対応する。</p>
+  </div>
+
   <!-- ── Step 1: Document Loader ── -->
   <div class="topic">
     <div class="topic-title">Step 1 ── Document Loader でPDFを読み込む</div>
@@ -209,6 +214,19 @@ print(f<span class="str">"読み込んだページ数: {len(pages)}"</span>)
 print(pages[0].page_content[:200])</div>
 
     <p style="font-size:.9rem;color:var(--gray-700);line-height:1.8;margin-top:12px">PDFの内容がテキストとして取得される。RAGの第一歩は、対象文書をシステムに取り込むこと。</p>
+
+    <div class="reveal-wrap">
+      <button class="reveal-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>Document Loaderとは何か</button>
+      <div class="reveal-content">
+        <ul>
+          <li>LangChainが提供する「ファイル読み込み部品」の総称。PDF以外にも、Word、Excel、Webページ、CSVなど多数のフォーマットに対応している</li>
+          <li>PyPDFLoader は PDF専用のLoader。PDFファイルのパスを渡すと、ページごとにテキストを抽出してくれる</li>
+          <li>loader.load() を実行すると、Documentオブジェクトのリストが返る。各Documentには page_content（テキスト本文）と metadata（ページ番号など）が含まれている</li>
+          <li>実務では社内のFAQ文書、マニュアル、仕様書などをLoaderで読み込むことになる</li>
+        </ul>
+        <a class="ref-link" href="https://python.langchain.com/docs/concepts/document_loaders/" target="_blank" rel="noopener">LangChain Document Loaders</a>
+      </div>
+    </div>
   </div>
 
   <!-- ── Step 2: Text Splitter ── -->
@@ -234,6 +252,21 @@ chunks = splitter.split_documents(pages)</div>
         <p>前後50文字を重複させる。文脈が途切れるのを防ぐ。</p>
       </div>
     </div>
+
+    <div class="reveal-wrap">
+      <button class="reveal-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>なぜ文書を分割する必要があるのか</button>
+      <div class="reveal-content">
+        <ul>
+          <li>LLMには一度に処理できるテキスト量の上限がある（「コンテキストウィンドウ」と呼ぶ。GPT-4o-miniは約128,000トークン）</li>
+          <li>上限内でも、文書が長すぎると回答精度が下がる。関係のない部分まで読ませると「ノイズ」になる</li>
+          <li>そのため、文書を小さな塊（チャンク）に分割し、質問に関連するチャンクだけをLLMに渡す戦略を取る</li>
+          <li>chunk_size=500 は「500文字ごとに区切る」という意味。短すぎると文脈が失われ、長すぎると検索精度が落ちるため、300〜1000文字がよく使われる範囲</li>
+          <li>chunk_overlap=50 は「前のチャンクの最後50文字を次のチャンクの先頭にも含める」という意味。文の途中で切れて意味が通じなくなるのを防ぐ</li>
+          <li>RecursiveCharacterTextSplitter は段落 → 改行 → 文 → 文字 の順で分割点を探す賢いSplitter。単純に500文字で切るのではなく、なるべく文の区切りで分割しようとする</li>
+        </ul>
+        <a class="ref-link" href="https://python.langchain.com/docs/concepts/text_splitters/" target="_blank" rel="noopener">LangChain Text Splitters</a>
+      </div>
+    </div>
   </div>
 
   <!-- ── Step 3: Embedding ── -->
@@ -251,6 +284,22 @@ print(f<span class="str">"ベクトルの次元数: {len(vector)}"</span>)</div>
 
     <div class="callout">「意味が近いテキスト同士は数値的にも近くなる」という性質がある。これが類似検索の基盤。</div>
 
+    <div class="reveal-wrap">
+      <button class="reveal-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>Embedding（埋め込み表現）を直感的に理解する</button>
+      <div class="reveal-content">
+        <ul>
+          <li>Embeddingとは、テキストを数百〜数千個の数値の列（ベクトル）に変換する技術</li>
+          <li>たとえば「犬」→ [0.2, 0.8, 0.1, ...] のように変換される。この数値の列が、その単語の「意味」を表現している</li>
+          <li>地図の座標に例えるとわかりやすい。「東京」と「大阪」は地図上で近い位置にあるように、「犬」と「猫」はベクトル空間上で近い位置に配置される。「犬」と「経済学」は遠い位置になる</li>
+          <li>text-embedding-3-small は OpenAI が提供するEmbeddingモデル。テキストを1536次元のベクトルに変換する（1536個の数値の列）</li>
+          <li>embed_query() は1つのテキストをベクトルに変換するメソッド。検索クエリ（質問文）のベクトル化に使う</li>
+          <li>この変換により、テキスト同士の「意味の近さ」を数値で計算できるようになる。これがRAG検索の核心技術</li>
+        </ul>
+        <a class="ref-link" href="https://platform.openai.com/docs/guides/embeddings" target="_blank" rel="noopener">OpenAI Embeddings ガイド</a>
+        <a class="ref-link" href="https://platform.openai.com/docs/models#embeddings" target="_blank" rel="noopener">OpenAI Embedding モデル一覧</a>
+      </div>
+    </div>
+
     <div class="code-block"><span class="cm"># 2つの文の類似度を比較</span>
 text_a = <span class="str">"RAGとは検索拡張生成です"</span>
 text_b = <span class="str">"Retrieval-Augmented Generationの略です"</span>
@@ -259,6 +308,18 @@ text_c = <span class="str">"今日の天気は晴れです"</span>
 <span class="cm"># コサイン類似度: 1に近いほど意味が近い</span>
 <span class="cm"># RAG同士 → 0.4〜0.5前後（意味が近いので高い）</span>
 <span class="cm"># RAGと天気 → 0.1〜0.2前後（関係ない話題なので低い）</span></div>
+
+    <div class="reveal-wrap">
+      <button class="reveal-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>コサイン類似度とは</button>
+      <div class="reveal-content">
+        <ul>
+          <li>2つのベクトルがどれくらい同じ方向を向いているかを表す指標。値は -1 から 1 の範囲</li>
+          <li>1 = 完全に同じ意味、0 = まったく無関係、-1 = 正反対の意味</li>
+          <li>計算の詳細は知らなくてよい。「数値が1に近いほど意味が似ている」とだけ覚えておけば十分</li>
+          <li>実際にはLangChainとFAISSが内部で自動計算してくれるため、自分でコサイン類似度を計算するコードを書く必要はない</li>
+        </ul>
+      </div>
+    </div>
   </div>
 
   <!-- ── Step 4: Vector Store ── -->
@@ -272,6 +333,21 @@ vectorstore = FAISS.from_documents(chunks, embeddings)
 print(f<span class="str">"Vector Storeへの格納完了。格納チャンク数: {len(chunks)}"</span>)</div>
 
     <p style="font-size:.9rem;color:var(--gray-700);line-height:1.8;margin-top:12px">FAISSはMeta社が開発した、ローカルで動作するVector Store。本番環境ではPinecone、Weaviateなどのクラウドサービスを使うこともある。</p>
+
+    <div class="reveal-wrap">
+      <button class="reveal-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>Vector Store（ベクトルストア）とは</button>
+      <div class="reveal-content">
+        <ul>
+          <li>ベクトルに変換されたテキストチャンクを保存し、検索できるようにするデータベース</li>
+          <li>通常のデータベース（SQLなど）は「キーワードの完全一致・部分一致」で検索する。Vector Storeは「意味の近さ」で検索できる点が根本的に異なる</li>
+          <li>FAISS.from_documents(chunks, embeddings) は、チャンクを1つずつEmbeddingモデルでベクトル化し、FAISSに格納する処理。チャンク数が多いほど時間がかかる（API呼び出しが発生するため）</li>
+          <li>FAISSはローカルPC上で動作する。データはメモリ上に保持され、プログラム終了時に消える（永続化も可能だが本研修では扱わない）</li>
+          <li>本番環境ではPinecone、Weaviate、Chromaなどのクラウド型Vector Storeを使うことが多い</li>
+        </ul>
+        <a class="ref-link" href="https://python.langchain.com/docs/concepts/vectorstores/" target="_blank" rel="noopener">LangChain Vector Stores</a>
+        <a class="ref-link" href="https://github.com/facebookresearch/faiss" target="_blank" rel="noopener">FAISS GitHub</a>
+      </div>
+    </div>
   </div>
 
   <!-- ── Step 5: Retriever ── -->
@@ -291,6 +367,20 @@ for i, doc in enumerate(results):
     print(doc.page_content[:200])</div>
 
     <div class="callout">質問の「意味」に近い文書が、大量のチャンクの中から見つかる。これがRAGの核心。</div>
+
+    <div class="reveal-wrap">
+      <button class="reveal-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>Retriever（リトリーバー）とは</button>
+      <div class="reveal-content">
+        <ul>
+          <li>Vector Storeから関連文書を取り出す「検索係」の役割を担うオブジェクト</li>
+          <li>vectorstore.as_retriever() でVector StoreをRetrieverに変換する。変換後は retriever.invoke(質問文) で検索結果が返る</li>
+          <li>search_kwargs={"k": 3} は「上位3件を返す」という設定。kを大きくすれば多くの文書が返るが、関連性の低い文書も混ざりやすくなる</li>
+          <li>Retrieverが返すのはDocumentオブジェクトのリスト。各Documentの page_content に文書テキストが入っている</li>
+          <li>この検索結果が、次のSession 04でLLMに渡される「参考資料」になる</li>
+        </ul>
+        <a class="ref-link" href="https://python.langchain.com/docs/concepts/retrievers/" target="_blank" rel="noopener">LangChain Retrievers</a>
+      </div>
+    </div>
   </div>
 
   <!-- ── 自分で試してみよう ── -->
@@ -320,6 +410,10 @@ def retrieve_node(state):
     <div class="ref-title">参考リンク</div>
     <a class="ref-link" href="https://python.langchain.com/docs/concepts/vectorstores/" target="_blank" rel="noopener">LangChain Vector Stores docs</a>
     <a class="ref-link" href="https://github.com/facebookresearch/faiss" target="_blank" rel="noopener">FAISS GitHub</a>
+    <a class="ref-link" href="https://python.langchain.com/docs/integrations/document_loaders/" target="_blank" rel="noopener">LangChain Document Loaders一覧</a>
+    <a class="ref-link" href="https://platform.openai.com/docs/guides/embeddings" target="_blank" rel="noopener">OpenAI Embeddings ガイド</a>
+    <a class="ref-link" href="https://python.langchain.com/docs/concepts/text_splitters/" target="_blank" rel="noopener">LangChain Text Splitters</a>
+    <a class="ref-link" href="https://python.langchain.com/docs/concepts/retrievers/" target="_blank" rel="noopener">LangChain Retrievers</a>
   </div>
 
 </section>

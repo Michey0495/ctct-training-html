@@ -198,6 +198,38 @@ a:hover{opacity:.7}
     <div class="box accent">回答を生成</div>
   </div>
 
+  <div class="reveal-wrap">
+    <button class="reveal-btn">
+      LLM（大規模言語モデル）とは
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div class="reveal-content">
+      <ul>
+        <li>LLM = Large Language Model の略。ChatGPTの裏側で動いているAIの本体にあたる。</li>
+        <li>大量のテキストデータ（インターネット上の文章、書籍など）を学習し、「次にどんな単語が来るか」を予測する仕組みで文章を生成する。</li>
+        <li>GPT-4o-mini は OpenAI社が開発したLLMの一つ。本研修ではこのモデルを使用する。</li>
+        <li>LLMの制約として、学習データの時点以降の情報を知らない。たとえば昨日の社内会議の議事録は知らない。この制約を補うのがRAGという技術になる。</li>
+      </ul>
+      <p><a href="https://platform.openai.com/docs/concepts" target="_blank" rel="noopener">OpenAI Concepts ドキュメント</a></p>
+    </div>
+  </div>
+
+  <div class="reveal-wrap">
+    <button class="reveal-btn">
+      APIとAPIキーとは
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div class="reveal-content">
+      <ul>
+        <li>API（Application Programming Interface）= ソフトウェア同士が会話するための窓口。</li>
+        <li>たとえば「レストランの注文窓口」のようなもの。あなた（プログラム）がメニュー（API仕様）に沿って注文（リクエスト）すると、キッチン（サーバー）が料理（レスポンス）を返してくれる。</li>
+        <li>APIキー = その窓口を使うための「会員証」。誰がいつ使ったか記録・管理するために必要になる。</li>
+        <li>研修用のAPIキーは .env ファイルに記載済み。このキーは研修専用で、費用は研修側で負担している。</li>
+      </ul>
+      <p><a href="https://platform.openai.com/docs/api-reference" target="_blank" rel="noopener">OpenAI API リファレンス</a></p>
+    </div>
+  </div>
+
   <div class="topic">
     <div class="topic-title">使用する技術</div>
   </div>
@@ -207,26 +239,36 @@ a:hover{opacity:.7}
       <div class="card-num">01</div>
       <h3>Python</h3>
       <p>プログラミング言語。本研修ではPython 3.11以上を使用する。</p>
+      <p>AIやデータ分析の分野で最も使われている言語。文法がシンプルで読みやすく、ライブラリ（便利な部品集）が豊富。</p>
+      <p><a href="https://docs.python.org/ja/3/" target="_blank" rel="noopener">Python公式ドキュメント</a></p>
     </div>
     <div class="card">
       <div class="card-num">02</div>
       <h3>LangChain</h3>
       <p>LLMを使ったシステム構築ライブラリ。プロンプト管理からチェーン実行まで一貫して扱える。</p>
+      <p>LLMを直接呼び出すだけならLangChainは不要だが、プロンプト管理、外部データの取り込み、複数ステップの処理連結など、実用的なシステムを作るときに必要な部品が揃っている。</p>
+      <p><a href="https://python.langchain.com/docs/" target="_blank" rel="noopener">LangChain公式ドキュメント</a></p>
     </div>
     <div class="card">
       <div class="card-num">03</div>
       <h3>LangGraph</h3>
       <p>複数処理を順番に繋いで実行するフレームワーク。State / Node / Edgeの3概念でワークフローを定義する。</p>
+      <p>LangChainの上位ライブラリ。「この処理の次はこの処理」という流れ（ワークフロー）を、視覚的にわかりやすいグラフ構造で定義できる。</p>
+      <p><a href="https://langchain-ai.github.io/langgraph/" target="_blank" rel="noopener">LangGraph公式ドキュメント</a></p>
     </div>
     <div class="card">
       <div class="card-num">04</div>
       <h3>OpenAI API</h3>
       <p>GPT-4o-miniとEmbeddingモデルの呼び出しに使用する。APIキーは研修用のものを配布済み。</p>
+      <p>OpenAI社（ChatGPTの開発元）が提供する有料のAPI。プログラムからChatGPTと同じAIを呼び出せる。GPT-4o-miniは高速・低コストのモデル。Embeddingモデルはテキストを数値（ベクトル）に変換する用途で使う（Session 03で詳しく扱う）。</p>
+      <p><a href="https://platform.openai.com/docs/models" target="_blank" rel="noopener">OpenAI モデル一覧</a></p>
     </div>
     <div class="card">
       <div class="card-num">05</div>
       <h3>FAISS</h3>
       <p>ベクトル検索のローカルDB。Meta社が開発したオープンソースライブラリで、高速な類似度検索が可能。</p>
+      <p>FAISS = Facebook AI Similarity Search の略。数千から数百万件のテキストの中から「意味が近いもの」を高速に見つけ出す。データベースのようなものだが、キーワード一致ではなく意味の近さで検索できる点が特徴。</p>
+      <p><a href="https://github.com/facebookresearch/faiss" target="_blank" rel="noopener">FAISS GitHub リポジトリ</a></p>
     </div>
   </div>
 
@@ -237,6 +279,42 @@ a:hover{opacity:.7}
 <section class="section" id="handson">
   <div class="section-label">HANDS-ON / 10 MIN</div>
   <div class="section-title">環境接続テスト</div>
+
+  <div class="topic">
+    <div class="topic-title">開発環境の前提知識</div>
+    <p>テストを実行する前に、これから扱う環境の仕組みを押さえておく。</p>
+  </div>
+
+  <div class="reveal-wrap">
+    <button class="reveal-btn">
+      仮想環境（.venv）とは
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div class="reveal-content">
+      <ul>
+        <li>Pythonのプロジェクトごとに独立したライブラリ環境を作る仕組み。</li>
+        <li>たとえばプロジェクトAでは LangChain 0.3 を使い、プロジェクトBでは LangChain 0.2 を使う、ということが可能になる。</li>
+        <li>.venv フォルダの中にそのプロジェクト専用のPythonとライブラリが入っている。</li>
+        <li>有効化コマンド: <code>.venv\Scripts\Activate.ps1</code>（Windows）。プロンプト先頭に (.venv) と表示されれば有効化済み。</li>
+      </ul>
+      <p><a href="https://docs.python.org/ja/3/library/venv.html" target="_blank" rel="noopener">Python公式 venv ドキュメント</a></p>
+    </div>
+  </div>
+
+  <div class="reveal-wrap">
+    <button class="reveal-btn">
+      .envファイルとは
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div class="reveal-content">
+      <ul>
+        <li>環境変数（プログラムの外から渡す設定値）を記録するファイル。</li>
+        <li>APIキーのような機密情報をコードに直接書くとセキュリティリスクがある。.envファイルに分離することで、コードを他人に見せてもキーが漏れない。</li>
+        <li>本研修では <code>OPENAI_API_KEY=sk-xxxxx</code> という形式でAPIキーが記録されている。</li>
+        <li>Pythonの dotenv ライブラリが .env ファイルを読み込んでくれる。</li>
+      </ul>
+    </div>
+  </div>
 
   <div class="topic">
     <div class="topic-title">ファイル: 00_test_connection.py</div>
@@ -332,6 +410,15 @@ Embedding 接続テスト中...
       <div class="flow-step-label">Step 4: 編集後は保存してから再実行</div>
       <div class="flow-step-desc">コードを編集したら <code>Ctrl+S</code> で保存してから再実行する。保存忘れは最も多いミス。</div>
     </div>
+  </div>
+
+  <div class="ref-section">
+    <div class="ref-title">参考リンク</div>
+    <a class="ref-link" href="https://docs.python.org/ja/3/" target="_blank" rel="noopener">Python公式ドキュメント</a>
+    <a class="ref-link" href="https://platform.openai.com/docs/api-reference" target="_blank" rel="noopener">OpenAI APIリファレンス</a>
+    <a class="ref-link" href="https://python.langchain.com/docs/" target="_blank" rel="noopener">LangChain公式ドキュメント</a>
+    <a class="ref-link" href="https://langchain-ai.github.io/langgraph/" target="_blank" rel="noopener">LangGraph公式ドキュメント</a>
+    <a class="ref-link" href="https://code.visualstudio.com/" target="_blank" rel="noopener">VSCode公式サイト</a>
   </div>
 
 </section>

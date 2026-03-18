@@ -215,6 +215,11 @@ a:hover{opacity:.7}
     </div>
   </div>
 
+  <div class="callout">
+    <div class="callout-title">なぜLangGraphを使うのか ── 単純なスクリプトとの違い</div>
+    <p>Session 02-03で書いたコードは「上から順に実行するだけ」のスクリプトだった。しかし実際のAIシステムでは「検索結果が不十分なら再検索する」「エラーが出たら別の処理に分岐する」といった条件分岐が必要になる。LangGraphはこうした複雑な処理フローを、State（データ）+ Node（処理）+ Edge（順序）の3要素だけで見通しよく定義できる。</p>
+  </div>
+
   <!-- Step 1 -->
   <div class="topic">
     <div class="topic-title"><span>Step 1</span> ── Stateを定義する</div>
@@ -223,6 +228,22 @@ a:hover{opacity:.7}
 <span class="kw">class</span> <span class="type">SimpleState</span>(TypedDict):
     question: <span class="type">str</span>   <span class="comment"># ユーザーの質問</span>
     answer: <span class="type">str</span>     <span class="comment"># AIの回答</span></div>
+
+    <div class="reveal-wrap">
+      <button class="reveal-btn">
+        TypedDictとStateの仕組み
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="reveal-content">
+        <ul>
+          <li>TypedDict はPythonの型ヒント機能の一つ。辞書（dict）のキー名と値の型をあらかじめ宣言できる</li>
+          <li><code>class SimpleState(TypedDict):</code> は「SimpleStateという名前の辞書で、question（文字列）とanswer（文字列）のキーを持つ」と定義している</li>
+          <li>LangGraphでは、このStateがグラフ全体の「共有メモ帳」として機能する。あるNodeがquestionを読み、別のNodeがanswerを書き込む、という形でデータが流れる</li>
+          <li>Session 02で学んだPythonの辞書（dict）に型情報を追加したもの、と理解すればよい</li>
+        </ul>
+        <p style="margin-top:10px"><a href="https://docs.python.org/ja/3/library/typing.html#typing.TypedDict" target="_blank">Python公式: TypedDict ドキュメント</a></p>
+      </div>
+    </div>
   </div>
 
   <!-- Step 2 -->
@@ -235,6 +256,22 @@ a:hover{opacity:.7}
 <span class="kw">def</span> <span class="fn">answer_node</span>(state: SimpleState) -&gt; <span class="type">dict</span>:
     response = model.<span class="fn">invoke</span>(state[<span class="str">"question"</span>])
     <span class="kw">return</span> {<span class="str">"answer"</span>: response.content}</div>
+
+    <div class="reveal-wrap">
+      <button class="reveal-btn">
+        Nodeは普通のPython関数
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="reveal-content">
+        <ul>
+          <li>LangGraphのNodeは特別なものではなく、普通のPython関数。Session 02で学んだ <code>def greet(name):</code> と同じ</li>
+          <li>唯一のルール: 引数としてStateを受け取り、更新したいキーと値の辞書を返す</li>
+          <li><code>log_node</code> は <code>return {}</code> で空辞書を返している。これは「Stateを何も変更しない」という意味。printで質問を表示するだけのノード</li>
+          <li><code>answer_node</code> は <code>return {"answer": response.content}</code> で、Stateのanswerキーを更新している</li>
+          <li>ノードの中ではAPI呼び出し、データベース操作、ファイル読み書きなど、好きな処理を書ける</li>
+        </ul>
+      </div>
+    </div>
   </div>
 
   <!-- Step 3 -->
@@ -257,6 +294,25 @@ app = graph.<span class="fn">compile</span>()</div>
       <div class="box">answer_node</div>
       <div class="arr">&#8594;</div>
       <div class="box accent">END</div>
+    </div>
+
+    <div class="reveal-wrap">
+      <button class="reveal-btn">
+        グラフの組み立て方を一行ずつ理解する
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="reveal-content">
+        <ul>
+          <li><code>StateGraph(SimpleState)</code>: 「SimpleStateを共有データとして使うグラフ」を新規作成</li>
+          <li><code>add_node("log", log_node)</code>: "log"という名前でlog_node関数をグラフに登録</li>
+          <li><code>add_node("answer", answer_node)</code>: "answer"という名前でanswer_node関数を登録</li>
+          <li><code>set_entry_point("log")</code>: 「最初に実行するノードはlogです」と指定</li>
+          <li><code>add_edge("log", "answer")</code>: 「logの次はanswerを実行」と接続</li>
+          <li><code>add_edge("answer", END)</code>: 「answerの次は終了」と接続。ENDはLangGraphが提供する特殊な終了マーカー</li>
+          <li><code>compile()</code>: 上の設定を確定し、実行可能なアプリケーションにする。コンパイル後に <code>app.invoke()</code> で実行できる</li>
+        </ul>
+        <p style="margin-top:10px"><a href="https://langchain-ai.github.io/langgraph/concepts/low_level/" target="_blank">LangGraph: Low-level concepts</a></p>
+      </div>
     </div>
   </div>
 
@@ -297,6 +353,11 @@ app = graph.<span class="fn">compile</span>()</div>
     <div class="box">質問で検索</div>
     <div class="arr">&#8594;</div>
     <div class="box">LLMが回答</div>
+  </div>
+
+  <div class="callout">
+    <div class="callout-title">午前のすべてがここに集約される</div>
+    <p>このコードには Session 01 で確認したAPI接続、Session 02 で学んだChatOpenAI/Prompt Template/LCEL、Session 03 で体験した5つのRAGコンポーネント、そしてこのSession 04のLangGraphが全て含まれている。新しい要素は一つもない。既に学んだパーツを組み合わせているだけ。</p>
   </div>
 
   <!-- コードの全体構成 -->
@@ -348,6 +409,20 @@ app = graph.<span class="fn">compile</span>()</div>
       <div class="box">generate_node</div>
       <div class="arr">&#8594;</div>
       <div class="box accent">END</div>
+    </div>
+
+    <div class="reveal-wrap">
+      <button class="reveal-btn">
+        retrieve_nodeとgenerate_nodeの処理を追う
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="reveal-content">
+        <ul>
+          <li><code>retrieve_node</code>: Stateからquestion（質問文）を取り出し → Retriever（Session 03のStep 5）に渡して検索 → 検索結果をdocumentsとしてStateに書き込む</li>
+          <li><code>generate_node</code>: Stateからdocuments（検索結果）とquestion（質問）を取り出す → documentsを改行で連結してcontextを作る → ChatPromptTemplate（Session 02のStep 2）でsystemメッセージに文書を埋め込む → LCEL（Session 02のStep 3）でLLMに渡す → 回答をanswerとしてStateに書き込む</li>
+          <li>つまり retrieve_node = RAGの「検索」担当、generate_node = RAGの「生成」担当。Session 01の冒頭で示したRAGの全体像がそのまま実現されている</li>
+        </ul>
+      </div>
     </div>
   </div>
 
@@ -420,12 +495,29 @@ PCが起動しない場合の対処手順は以下の通りです。
     <p>午前の部はここで終了。午後はAI駆動開発（Claude Code）に入ります。</p>
   </div>
 
+  <div class="callout">
+    <div class="callout-title">午前の振り返りチェックリスト</div>
+    <ul style="padding-left:1.3em;margin-top:8px;font-size:.88rem;color:var(--gray-700);line-height:1.85">
+      <li>LLMをPythonから呼び出せた（model.invoke）</li>
+      <li>temperatureの意味がわかった</li>
+      <li>Prompt TemplateとLCELでChainを組めた</li>
+      <li>PDFをDocument Loaderで読み込めた</li>
+      <li>テキストをEmbeddingでベクトルに変換する意味がわかった</li>
+      <li>FAISSでベクトル検索ができた</li>
+      <li>LangGraphでState/Node/Edgeを使ったワークフローを組めた</li>
+      <li>RAGシステム全体が動作するのを確認できた</li>
+    </ul>
+  </div>
+
   <div class="ref-section">
     <div class="ref-title">Session 04 参考リンク</div>
     <a href="https://langchain-ai.github.io/langgraph/" target="_blank" class="ref-link">LangGraph 公式ドキュメント</a>
     <a href="https://python.langchain.com/docs/tutorials/rag/" target="_blank" class="ref-link">LangChain RAG チュートリアル</a>
     <a href="https://python.langchain.com/docs/concepts/lcel/" target="_blank" class="ref-link">LCEL 概要</a>
     <a href="https://github.com/langchain-ai/langgraph/tree/main/examples" target="_blank" class="ref-link">LangGraph サンプル集（GitHub）</a>
+    <a href="https://langchain-ai.github.io/langgraph/tutorials/introduction/" target="_blank" class="ref-link">LangGraph Quickstart</a>
+    <a href="https://docs.python.org/ja/3/library/typing.html#typing.TypedDict" target="_blank" class="ref-link">Python TypedDict</a>
+    <a href="https://python.langchain.com/docs/concepts/rag/" target="_blank" class="ref-link">RAG概念の解説（LangChain）</a>
   </div>
 </section>
 
